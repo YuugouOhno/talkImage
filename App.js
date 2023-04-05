@@ -1,10 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import GetImage from "./GetImage"
 
 export default function App() {
   return (
     <View style={styles.container}>
       <Text>あなたのトークからイラストを出力します！！！！！！</Text>
+      <GetImage />
       <StatusBar style="auto" />
     </View>
   );
