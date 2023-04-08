@@ -1,8 +1,8 @@
 import React from 'react';
 import { useState } from "react";
-import { Image } from 'react-native';
+import { Image, Button, TextInput, View, Text } from 'react-native';
 import { OPEN_AI_API_KEY } from 'dotenv';
-import MyImage from './assets/MyImage.png';
+// import { MyImage } from './assets/MyImage.png'
 
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
@@ -11,10 +11,14 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const GetImage = () => {
+    const MyImage = require('./assets/MyImage.png')
     const [userPrompt, setUserPrompt] = useState("")
     const [imageUrl, setImageUrl] = useState("")
+    const [test, setTest] = useState("")
 
     const generateImage = async () => {
+        setTest("クリックされました")
+        console.log("Generating image")
         const imageParameters = {
             prompt: userPrompt,
             n: 1,
@@ -22,23 +26,21 @@ const GetImage = () => {
         }
         const response = await openai.createImage(imageParameters);
         const urlData = response.data.data[0].url
-        console.log(urlData);
         setImageUrl(urlData);
+        console(urlData);
     }
 
     return (
-        <div className="App">
+        <View>
             {
                 imageUrl
-                    ? <img src={imageUrl} className="image" alt="ai thing" />
-                    : <img src={MyImage} className="image" alt="MyImage" />
+                    ? <Image style={{ width: 100, height: 100 }}source={imageUrl} />
+                    : <Image style={{ width: 100, height: 100 }}source={MyImage} />
             }
-            <input
-                placeholder='プロンプトの入力'
-                onChange={(e) => setUserPrompt(e.target.value)}
-            />
-            <button onClick={() => generateImage()}>Generate</button>
-        </div>
+            <TextInput placeholder='プロンプトの入力' value={userPrompt} onChangeText={(value) => setUserPrompt(value)} />
+            <Button title="Generate" onPress={generateImage} />
+            <Text>{test}</Text>
+        </View>
     )
 }
 
