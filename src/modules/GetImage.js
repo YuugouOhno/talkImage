@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Image, Button, TextInput, View, Text } from 'react-native';
 import { OPEN_AI_API_KEY } from 'dotenv';
 import 'react-native-url-polyfill/auto';
-// import { MyImage } from './assets/MyImage.png'
+import Translate from './Translate';
 
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
@@ -12,14 +12,13 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const GetImage = () => {
-    const MyImage = require('./assets/MyImage.png')
+    const MyImage = require('../../assets/MyImage.png')
     const [userPrompt, setUserPrompt] = useState("")
     const [imageUrl, setImageUrl] = useState("")
     const [test, setTest] = useState("")
 
     const generateImage = async () => {
         setTest("クリックされました")
-        console.log("Generating image")
         const imageParameters = {
             prompt: userPrompt,
             n: 1,
