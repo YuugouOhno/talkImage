@@ -13,14 +13,21 @@ const Ranking = () => {
       type: 'text/plain',
     });
     if (result.type === 'success') {
-      setFile(result.file);
+      // Blobに変換するコード （なぜか変換しなくてもうまくいった）
+      // const fetchResponse = await fetch(result.uri);
+      // const blob = await fetchResponse.blob();
+      setFile(result);
     }
   };
 
   // リクエストの作成
   const submitFile = async () => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', {
+      uri: file.uri,
+      type: file.mimeType,
+      name: file.name,
+    });
 
     // リクエストの送信＆レスポンスの受け取り
     try {
@@ -56,4 +63,4 @@ const Ranking = () => {
   );
 }
 
-export default Ranking
+export default Ranking;
