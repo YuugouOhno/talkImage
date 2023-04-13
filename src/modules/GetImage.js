@@ -101,7 +101,7 @@ const GetImage = () => {
                 const urlData = response.data.data[0].url
                 // 結果をurlDataに入れる
                 setImageUrl(urlData);
-                // ローディングの終了
+                // 画像の生成完了
                 setNowPhase(3);
             } catch (error) {
                 console.error(error);
@@ -118,8 +118,19 @@ const GetImage = () => {
         setPrompt_ja(newPrompt)
     }
 
+    // 最初に戻る
+    const reStart = () => {
+        // stateを全て初期化
+        setFile(null);
+        setRanking(null);
+        setPrompt_ja(null);
+        setPrompt_en(null);
+        setImageUrl(null);
+        setNewWord(null);
 
-
+        //初期状態に戻る
+        setNowPhase(1);
+    }
 
     switch (nowPhase) {
         case 1:
@@ -159,18 +170,14 @@ const GetImage = () => {
                                 <Text>プロンプト：{prompt_ja}</Text>
                                 <TextInput placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
                                 <Button title="画像の再生成" onPress={reGenerate} />
+                                <Button title="最初からやり直す" onPress={reStart} />
                             </View>
                         )
                     }
+                    
                 </View>
             )
     }
-
-
-
-
-
-
 }
 
 export default GetImage;
