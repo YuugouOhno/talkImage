@@ -6,7 +6,6 @@ import GetImage from "./src/modules/GetImage"
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>あなたのトークからイラストを出力します！！！！！！</Text>
       <GetImage />
       <StatusBar style="auto" />
     </View>

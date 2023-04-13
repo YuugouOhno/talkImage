@@ -20,8 +20,10 @@ const GetImage = () => {
     const [prompt_ja, setPrompt_ja] = useState(null); // ランキングトップ３をカンマ区切りで
     const [prompt_en, setPrompt_en] = useState(null); // 上を英訳
     const [imageUrl, setImageUrl] = useState(null); // 出力された画像のURL
-    const [isLoading, setIsLoading] = useState(false); // ローディング中の判定
     const [newWord, setNewWord] = useState(null); // プロンプトを後から追加
+
+    // 現在のフェーズを判定する　1:初期状態 2:ローディング中 3: 生成完了
+    const [nowPhase, setNowPhase] = useState(1);
 
     // 選択したファイルをセットする
     const selectFile = async () => {
@@ -36,7 +38,7 @@ const GetImage = () => {
     // ファイルを一連の処理を開始する
     const generate = async () => {
         //ローディングを開始する
-        setIsLoading(true);
+        setNowPhase(2);
         const formData = new FormData();
         formData.append('file', {
             uri: file.uri,
@@ -64,7 +66,7 @@ const GetImage = () => {
     //pronptの英訳
     //prompt_jaを監視して、変更があった場合に実行される
     useEffect(() => {
-        console.log(prompt_ja,"を英訳")
+        console.log(prompt_ja, "を英訳")
         if (prompt_ja) {
             // 渡されたプロンプトを英語に変換
             async function translatePrompt() {
@@ -86,7 +88,7 @@ const GetImage = () => {
     //画像の生成
     //prompt_enを監視して、変更があった場合に実行される
     useEffect(() => {
-        console.log(prompt_en,"から画像を生成")
+        console.log(prompt_en, "から画像を生成")
         async function generateImage() {
             // 画像生成の条件
             const imageParameters = {
@@ -100,7 +102,7 @@ const GetImage = () => {
                 // 結果をurlDataに入れる
                 setImageUrl(urlData);
                 // ローディングの終了
-                setIsLoading(false);
+                setNowPhase(3);
             } catch (error) {
                 console.error(error);
             }
@@ -108,44 +110,67 @@ const GetImage = () => {
         generateImage();
     }, [prompt_en]);
 
-    const addPrompt = () => {
+    // 画像を再生成する
+    const reGenerate = () => {
         //ローディングを開始する
-        setIsLoading(true);
+        setNowPhase(2);
         const newPrompt = prompt_ja + "," + newWord
         setPrompt_ja(newPrompt)
     }
 
-    return (
-        <View>
-            <Button title="ファイルを選択してください" onPress={selectFile} />
-            {file && (
-                <Text>選択されたファイル：{file.name}</Text>
-            )}
-            {ranking && (
-                ranking.map((item, index) => (
-                    <View key={index}>
-                        <Text>{item.rank}位「{item.word}」（{item.num_of_use}回）</Text>
-                    </View>
-                )))}
-            {
-                imageUrl
-                    ?
-                    <View>
-                        <Image style={{ width: 100, height: 100 }} source={{ uri: imageUrl }} />
-                        <Text>プロンプト：{prompt_ja}</Text>
-                        <TextInput placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
-                        <Button title="画像の生成" onPress={addPrompt}/>
-                    </View>
-                    : 
+
+
+
+    switch (nowPhase) {
+        case 1:
+            return (
+                <View>
+                    <Text>あなたのトーク履歴から、世界に一枚だけの画像を生成します</Text>
+                    <Button title="ファイルを選択してください" onPress={selectFile} />
+                    {
+                        file && (
+                            <Text>選択されたファイル：{file.name}</Text>
+                        )
+                    }
                     <Button title="画像の生成" onPress={generate} disabled={!file} />
-            }
-            {
-                isLoading
-                    ? <Text>now loading ...</Text>
-                    : ""
-            }
-        </View>
-    )
+                </View>
+            )
+        case 2:
+            return (
+                <View>
+                    <Text>now loading ...</Text>
+                </View>
+            )
+        case 3:
+            return (
+                <View>
+                    {
+                        ranking && (
+                            ranking.map((item, index) => (
+                                <View key={index}>
+                                    <Text>{item.rank}位「{item.word}」（{item.num_of_use}回）</Text>
+                                </View>
+                            )))
+                    }
+                    {
+                        imageUrl && (
+                            <View>
+                                <Image style={{ width: 100, height: 100 }} source={{ uri: imageUrl }} />
+                                <Text>プロンプト：{prompt_ja}</Text>
+                                <TextInput placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
+                                <Button title="画像の再生成" onPress={reGenerate} />
+                            </View>
+                        )
+                    }
+                </View>
+            )
+    }
+
+
+
+
+
+
 }
 
 export default GetImage;
