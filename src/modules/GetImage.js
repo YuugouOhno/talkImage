@@ -114,6 +114,8 @@ const GetImage = () => {
     const reGenerate = () => {
         //ローディングを開始する
         setNowPhase(2);
+        // 入力をクリアする
+        setNewWord(null);
         const newPrompt = prompt_ja + "," + newWord
         setPrompt_ja(newPrompt)
     }
@@ -156,16 +158,13 @@ const GetImage = () => {
             return (
                 <View>
                     {
-                        ranking && (
-                            ranking.map((item, index) => (
+                        ranking && imageUrl && (
+                            <View>
+                                {ranking.map((item, index) => (
                                 <View key={index}>
                                     <Text>{item.rank}位「{item.word}」（{item.num_of_use}回）</Text>
                                 </View>
-                            )))
-                    }
-                    {
-                        imageUrl && (
-                            <View>
+                                ))}
                                 <Image style={{ width: 100, height: 100 }} source={{ uri: imageUrl }} />
                                 <Text>プロンプト：{prompt_ja}</Text>
                                 <TextInput placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
@@ -174,7 +173,6 @@ const GetImage = () => {
                             </View>
                         )
                     }
-                    
                 </View>
             )
     }
