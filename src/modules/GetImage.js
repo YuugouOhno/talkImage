@@ -109,9 +109,10 @@ const GetImage = () => {
     }, [prompt_en]);
 
     const addPrompt = () => {
+        //ローディングを開始する
+        setIsLoading(true);
         const newPrompt = prompt_ja + "," + newWord
         setPrompt_ja(newPrompt)
-        console.log("追加じゃわっふぉい",newPrompt,newWord,prompt_ja)
     }
 
     return (
