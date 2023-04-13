@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Image, Button, TextInput, View, Text } from 'react-native';
+import { Image, Button, View, Text } from 'react-native';
 import 'react-native-url-polyfill/auto';
 import { OPEN_AI_API_KEY } from 'dotenv';
 import { TRANSLATE_KEY } from 'dotenv';
@@ -15,25 +15,26 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const GetImage = () => {
-    const [file, setFile] = useState(null);
-    const [ranking, setRanking] = useState(null);
-    const [prompt_ja, setPrompt_ja] = useState(null);
-    const [prompt_en, setPrompt_en] = useState(null);
-    const [imageUrl, setImageUrl] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [file, setFile] = useState(null); // トークのtxtファイル
+    const [ranking, setRanking] = useState(null); // トークでのランキングトップ１０
+    const [prompt_ja, setPrompt_ja] = useState(null); // ランキングトップ３をカンマ区切りで
+    const [prompt_en, setPrompt_en] = useState(null); // 上を英訳
+    const [imageUrl, setImageUrl] = useState(null); // 出力された画像のURL
+    const [isLoading, setIsLoading] = useState(false); // ローディング中の判定
 
     // 選択したファイルをセットする
     const selectFile = async () => {
         const result = await DocumentPicker.getDocumentAsync({
-            type: 'text/plain',
+            type: 'text/plain', // ファイルの形式
         });
         if (result.type === 'success') {
             setFile(result);
         }
     };
 
-    // リクエストの作成
-    const submitFile = async () => {
+    // ファイルを一連の処理を開始する
+    const generate = async () => {
+        //ローディングを開始する
         setIsLoading(true);
         const formData = new FormData();
         formData.append('file', {
@@ -50,8 +51,10 @@ const GetImage = () => {
                 },
             });
             const responseJson = JSON.parse(response.data.content);
+            // ランキングをセット
             setRanking(responseJson)
-            setPrompt_ja(responseJson[0]["word"] + " " + responseJson[1]["word"] + " " + responseJson[2]["word"]) 
+            //　上位3位をセット
+            setPrompt_ja(responseJson[0]["word"] + "," + responseJson[1]["word"] + "," + responseJson[2]["word"]) 
         } catch (error) {
             console.error(error);
         }
@@ -110,7 +113,7 @@ const GetImage = () => {
                 <Text>選択されたファイル：{file.name}</Text>
             )}
 
-            <Button title="画像の生成" onPress={submitFile} disabled={!file} />
+            <Button title="画像の生成" onPress={generate} disabled={!file} />
             {ranking && (
                 ranking.map((item, index) => (
                     <View key={index}>
