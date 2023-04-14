@@ -1,9 +1,8 @@
-import { Text, Image, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, Image, View, StyleSheet } from 'react-native';
 
 const Header = () => {
     const IconImage = require('../../assets/talkimage-icon.png')
     return (
-        // <TouchableOpacity onPress={() => alert('headerTitle Tapped')}>
         <View style={styles.container}>
             <Image
                 source={IconImage}
@@ -11,7 +10,6 @@ const Header = () => {
             />
             <Text style={styles.text}>Talk Image</Text>
         </View>
-        // </TouchableOpacity>
     );
 }
 
