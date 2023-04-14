@@ -1,19 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Loading = () => {
+const NomalLoading = () => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.overlay}/>
+      <Text style={styles.loading}>Loading</Text>
+    </View>
+  )
+}
 
+const Loading = (props) => {
+
+  // ファイル名を親コンポーネントから取得
+  const fileName = props.file.name;
+  // ファイル名からトーク相手の名前を取得
+  const you = fileName.replace('[LINE] ','').replace('とのトーク.txt','');
+  const talkHistories = props.talk;
+  
   // テキストファイルから取得したメッセージを格納
   const [messages, setMessages] = useState([
-    { sender: 'me', text: 'おはよう' },
-    { sender: 'you', text: 'おは' },
-    { sender: 'me', text: '元気?' },
-    { sender: 'you', text: '元気に決まってんだろ?' },
-    { sender: 'me', text: 'Be quiet' },
-    { sender: 'you', text: '怒るなよ' },
-    { sender: 'me', text: 'Unmnmnmn' },
-    { sender: 'you', text: 'お前ハーフだっけ？' },
-    { sender: 'me', text: 'Be quiet' }
+    { sender: talkHistories[0]["name"], text: talkHistories[0]["talk"] },
+    { sender: talkHistories[1]["name"], text: talkHistories[1]["talk"] },
+    { sender: talkHistories[2]["name"], text: talkHistories[2]["talk"] },
+    { sender: talkHistories[3]["name"], text: talkHistories[3]["talk"] },
+    { sender: talkHistories[4]["name"], text: talkHistories[4]["talk"] },
+    { sender: talkHistories[5]["name"], text: talkHistories[5]["talk"] },
+    { sender: talkHistories[6]["name"], text: talkHistories[6]["talk"] },
+    { sender: talkHistories[7]["name"], text: talkHistories[7]["talk"] },
+    { sender: talkHistories[8]["name"], text: talkHistories[8]["talk"] },
+    { sender: talkHistories[9]["name"], text: talkHistories[9]["talk"] },
   ]);
 
   // 表示されるメッセージ数を格納
@@ -44,10 +60,9 @@ const Loading = () => {
 
   
   const renderMessage = (message, index) => {
-    const me = message.sender === 'me';
     const containerStyle = {
-      backgroundColor: me ? '#DCF8C5' : '#FFF',
-      alignSelf: me ? 'flex-end' : 'flex-start',
+      backgroundColor: you == message.sender ? '#FFF' : '#DCF8C5',
+      alignSelf: you == message.sender ? 'flex-start' : 'flex-end',
       borderRadius: 5,
       marginBottom: 10,
       padding: 10,
@@ -96,4 +111,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default Loading;
+export {NomalLoading, Loading};
