@@ -19,8 +19,9 @@ const GetImage = () => {
     const [ranking, setRanking] = useState(null); // トークでのランキングトップ１０
     const [prompt_ja, setPrompt_ja] = useState(null); // ランキングトップ３をカンマ区切りで
     const [prompt_en, setPrompt_en] = useState(null); // 上を英訳
-    const [imageUrl, setImageUrl] = useState(null); // 出力された画像のURL
-    const [newWord, setNewWord] = useState(null); // プロンプトを後から追加
+    const [imageUrls, setImageUrls] = useState([]); // 出力された画像のURL
+    const [newWord, setNewWord] = useState(""); // プロンプトを後から追加
+    const MAX_IMAGES = 3 // 画像の保存上限を指定
 
     // 現在のフェーズを判定する　1:初期状態 2:ローディング中 3: 生成完了
     const [nowPhase, setNowPhase] = useState(1);
@@ -66,7 +67,7 @@ const GetImage = () => {
     //pronptの英訳
     //prompt_jaを監視して、変更があった場合に実行される
     useEffect(() => {
-        console.log(prompt_ja, "を英訳")
+        console.log(prompt_ja, "を英訳");
         if (prompt_ja) {
             // 渡されたプロンプトを英語に変換
             async function translatePrompt() {
@@ -81,14 +82,14 @@ const GetImage = () => {
                         console.log(error);
                     });
             }
-            translatePrompt()
+            translatePrompt();
         }
     }, [prompt_ja]);
 
     //画像の生成
     //prompt_enを監視して、変更があった場合に実行される
     useEffect(() => {
-        console.log(prompt_en, "から画像を生成")
+        console.log(prompt_en, "から画像を生成");
         async function generateImage() {
             // 画像生成の条件
             const imageParameters = {
@@ -98,9 +99,19 @@ const GetImage = () => {
             }
             try {
                 const response = await openai.createImage(imageParameters);
-                const urlData = response.data.data[0].url
                 // 結果をurlDataに入れる
-                setImageUrl(urlData);
+                const urlData = response.data.data[0].url;
+                // 画像が保存できる上限に達していたら、一番古い画像を削除する
+                if (imageUrls.length >= MAX_IMAGES) {
+                    console.log("限界突破")
+                    // 配列の最初を除外して、画像を配列に保存する
+                    setImageUrls([...imageUrls.slice(1,MAX_IMAGES),urlData])
+                } else {
+                    console.log("まだやれる")
+                    // 画像を配列に保存する
+                    setImageUrls([...imageUrls, urlData]);
+                }
+                console.log("生成された画像",imageUrls);
                 // 画像の生成完了
                 setNowPhase(3);
             } catch (error) {
@@ -114,10 +125,10 @@ const GetImage = () => {
     const reGenerate = () => {
         //ローディングを開始する
         setNowPhase(2);
+        const newPrompt = prompt_ja + "," + newWord;
+        setPrompt_ja(newPrompt);
         // 入力をクリアする
-        setNewWord(null);
-        const newPrompt = prompt_ja + "," + newWord
-        setPrompt_ja(newPrompt)
+        setNewWord("");
     }
 
     // 最初に戻る
@@ -127,8 +138,8 @@ const GetImage = () => {
         setRanking(null);
         setPrompt_ja(null);
         setPrompt_en(null);
-        setImageUrl(null);
-        setNewWord(null);
+        setImageUrls([]);
+        setNewWord("");
 
         //初期状態に戻る
         setNowPhase(1);
@@ -158,14 +169,18 @@ const GetImage = () => {
             return (
                 <View>
                     {
-                        ranking && imageUrl && (
+                        ranking && imageUrls && (
                             <View>
                                 {ranking.map((item, index) => (
-                                <View key={index}>
-                                    <Text>{item.rank}位「{item.word}」（{item.num_of_use}回）</Text>
-                                </View>
+                                    <View key={index}>
+                                        <Text>{item.rank}位「{item.word}」（{item.num_of_use}回）</Text>
+                                    </View>
                                 ))}
-                                <Image style={{ width: 100, height: 100 }} source={{ uri: imageUrl }} />
+                                {imageUrls.map((url, index) => (
+                                    <View key={index}>
+                                        <Image style={{ width: 100, height: 100 }} source={{ uri: url }} />
+                                    </View>
+                                ))}
                                 <Text>プロンプト：{prompt_ja}</Text>
                                 <TextInput placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
                                 <Button title="画像の再生成" onPress={reGenerate} />
