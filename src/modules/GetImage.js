@@ -98,10 +98,19 @@ const GetImage = () => {
             }
             try {
                 const response = await openai.createImage(imageParameters);
-                const urlData = response.data.data[0].url;
                 // 結果をurlDataに入れる
-                setImageUrls([...imageUrls, urlData]);
-                console.log(imageUrls);
+                const urlData = response.data.data[0].url;
+                // 画像が保存できる上限に達していたら、一番古い画像を削除する
+                if (imageUrls.length >= 3) {
+                    console.log("限界突破")
+
+                    setImageUrls([imageUrls[1],imageUrls[2],urlData])
+                } else {
+                    console.log("まだやれる")
+                    // 画像を配列に保存する
+                    setImageUrls([...imageUrls, urlData]);
+                }
+                console.log("生成された画像",imageUrls);
                 // 画像の生成完了
                 setNowPhase(3);
             } catch (error) {
@@ -128,7 +137,7 @@ const GetImage = () => {
         setRanking(null);
         setPrompt_ja(null);
         setPrompt_en(null);
-        setImageUrls(null);
+        setImageUrls([]);
         setNewWord(null);
 
         //初期状態に戻る
@@ -166,12 +175,11 @@ const GetImage = () => {
                                         <Text>{item.rank}位「{item.word}」（{item.num_of_use}回）</Text>
                                     </View>
                                 ))}
-                                {ranking.map((url, index) => (
+                                {imageUrls.map((url, index) => (
                                     <View key={index}>
                                         <Image style={{ width: 100, height: 100 }} source={{ uri: url }} />
                                     </View>
                                 ))}
-                                <Text>{imageUrls}</Text>
                                 <Text>プロンプト：{prompt_ja}</Text>
                                 <TextInput placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
                                 <Button title="画像の再生成" onPress={reGenerate} />
