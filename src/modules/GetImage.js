@@ -20,8 +20,8 @@ const GetImage = () => {
     const [prompt_ja, setPrompt_ja] = useState(null); // ランキングトップ３をカンマ区切りで
     const [prompt_en, setPrompt_en] = useState(null); // 上を英訳
     const [imageUrls, setImageUrls] = useState([]); // 出力された画像のURL
-    const [newWord, setNewWord] = useState(null); // プロンプトを後から追加
-    const MAX_IMAGES = 3
+    const [newWord, setNewWord] = useState(""); // プロンプトを後から追加
+    const MAX_IMAGES = 3 // 画像の保存上限を指定
 
     // 現在のフェーズを判定する　1:初期状態 2:ローディング中 3: 生成完了
     const [nowPhase, setNowPhase] = useState(1);
@@ -104,8 +104,7 @@ const GetImage = () => {
                 // 画像が保存できる上限に達していたら、一番古い画像を削除する
                 if (imageUrls.length >= MAX_IMAGES) {
                     console.log("限界突破")
-
-                    // setImageUrls([imageUrls[1],imageUrls[2],urlData])
+                    // 配列の最初を除外して、画像を配列に保存する
                     setImageUrls([...imageUrls.slice(1,MAX_IMAGES),urlData])
                 } else {
                     console.log("まだやれる")
@@ -126,10 +125,10 @@ const GetImage = () => {
     const reGenerate = () => {
         //ローディングを開始する
         setNowPhase(2);
-        // 入力をクリアする
-        setNewWord(null);
         const newPrompt = prompt_ja + "," + newWord;
         setPrompt_ja(newPrompt);
+        // 入力をクリアする
+        setNewWord("");
     }
 
     // 最初に戻る
@@ -140,7 +139,7 @@ const GetImage = () => {
         setPrompt_ja(null);
         setPrompt_en(null);
         setImageUrls([]);
-        setNewWord(null);
+        setNewWord("");
 
         //初期状態に戻る
         setNowPhase(1);
