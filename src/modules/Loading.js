@@ -3,12 +3,12 @@ import { View, Text, StyleSheet } from 'react-native';
 
 const NomalLoading = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.overlay}/>
-      <Text style={styles.loading}>Loading</Text>
+    <View style={normalLoadingStyles.container}>
+      <View style={normalLoadingStyles.overlay}/>
+      <Text style={normalLoadingStyles.loading}>Loading</Text>
     </View>
-  )
-}
+  );
+};
 
 const Loading = (props) => {
 
@@ -76,17 +76,38 @@ const Loading = (props) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.messagesContainer}>
+    <View style={loadingStyles.container}>
+      <View style={loadingStyles.messagesContainer}>
         {messages.slice(0, currentMessages + 1).map(renderMessage)}
       </View>
-      <View style={styles.overlay}/>
-      <Text style={styles.loading}>{loadingText}</Text>
+      <View style={loadingStyles.overlay}/>
+      <Text style={loadingStyles.loading}>{loadingText}</Text>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const normalLoadingStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F5FCFF',
+    padding: 20,
+    paddingTop:100,
+  },
+  loading:{
+    position:'absolute',
+    fontSize:30,
+    fontWeight:'bold',
+  },
+  overlay:{
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // 半透明の色
+  }
+
+});
+
+const loadingStyles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
@@ -102,7 +123,7 @@ const styles = StyleSheet.create({
   loading:{
     position:'absolute',
     fontSize:30,
-    fontWeight:'bold',
+    fontWeight:'bold'
   },
   overlay:{
       ...StyleSheet.absoluteFillObject,
