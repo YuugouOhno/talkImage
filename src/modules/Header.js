@@ -1,8 +1,31 @@
-import { Image, Button, View, Text, TextInput } from 'react-native';
+import { Text, Image, View, StyleSheet, TouchableOpacity } from 'react-native';
+
 const Header = () => {
+    const IconImage = require('../../assets/talkimage-icon.png')
     return (
-        <View><Text>ヘッダー</Text></View>
-    )
+        // <TouchableOpacity onPress={() => alert('headerTitle Tapped')}>
+        <View style={styles.container}>
+            <Image
+                source={IconImage}
+                style={{ width: 50, height: 50 }}
+            />
+            <Text style={styles.text}>Talk Image</Text>
+        </View>
+        // </TouchableOpacity>
+    );
 }
 
-export default Header
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    text:{
+        color: "white",
+        fontSize: 35,
+        marginLeft: 5
+    }
+});
+
+export default Header;
