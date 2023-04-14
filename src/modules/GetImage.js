@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Image, Button, View, Text, TextInput } from 'react-native';
+import { Image, Button, View, Text, TextInput, StyleSheet } from 'react-native';
 import 'react-native-url-polyfill/auto';
 import { OPEN_AI_API_KEY } from 'dotenv';
 import { TRANSLATE_KEY } from 'dotenv';
@@ -158,7 +158,7 @@ const GetImage = () => {
     switch (nowPhase) {
         case 1:
             return (
-                <View>
+                <View style={styles.container}>
                     <Text>あなたのトーク履歴から、世界に一枚だけの画像を生成します</Text>
                     <Button title="ファイルを選択してください" onPress={selectFile} />
                     {
@@ -171,9 +171,7 @@ const GetImage = () => {
             )
         case 2:
             return (
-                <View>
-                    <NomalLoading/>
-                </View>
+                <NomalLoading/>
             )
         case 3:
             return (
@@ -181,7 +179,7 @@ const GetImage = () => {
             )
         case 4:
             return (
-                <View>
+                <View style={styles.container}>
                     {
                         ranking && imageUrls && (
                             <View>
@@ -206,5 +204,14 @@ const GetImage = () => {
             )
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
+});
 
 export default GetImage;
