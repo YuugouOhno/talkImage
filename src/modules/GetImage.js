@@ -4,6 +4,8 @@ import 'react-native-url-polyfill/auto';
 import { OPEN_AI_API_KEY } from 'dotenv';
 import { TRANSLATE_KEY } from 'dotenv';
 import axios from 'axios';
+import {NomalLoading} from './Loading';
+import {Loading} from './Loading';
 
 import * as DocumentPicker from 'expo-document-picker';
 
@@ -16,6 +18,7 @@ const openai = new OpenAIApi(configuration);
 
 const GetImage = () => {
     const [file, setFile] = useState(null); // トークのtxtファイル
+    const [talk, setTalk] = useState(null); // トークでの連続１０件
     const [ranking, setRanking] = useState(null); // トークでのランキングトップ１０
     const [prompt_ja, setPrompt_ja] = useState(null); // ランキングトップ３をカンマ区切りで
     const [prompt_en, setPrompt_en] = useState(null); // 上を英訳
@@ -54,9 +57,16 @@ const GetImage = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            const responseJson = JSON.parse(response.data.content);
+
+            //　ここにトークメッセージを連続した１０件取得
+            const responseJsonTalk = JSON.parse(response.data.serial_talk);
+            setTalk(responseJsonTalk);
+            // loading画面に変移
+            setNowPhase(3);
+
+            const responseJson = JSON.parse(response.data.top_10);
             // ランキングをセット
-            setRanking(responseJson)
+            setRanking(responseJson);
             //　上位3位をセット
             setPrompt_ja(responseJson[0]["word"] + "," + responseJson[1]["word"] + "," + responseJson[2]["word"])
         } catch (error) {
@@ -113,7 +123,7 @@ const GetImage = () => {
                 }
                 console.log("生成された画像",imageUrls);
                 // 画像の生成完了
-                setNowPhase(3);
+                setNowPhase(4);
             } catch (error) {
                 console.error(error);
             }
@@ -162,10 +172,14 @@ const GetImage = () => {
         case 2:
             return (
                 <View>
-                    <Text>now loading ...</Text>
+                    <NomalLoading/>
                 </View>
             )
         case 3:
+            return (
+                <Loading file={file} talk={talk}/>
+            )
+        case 4:
             return (
                 <View>
                     {
