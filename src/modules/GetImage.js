@@ -21,6 +21,7 @@ const GetImage = () => {
     const [prompt_en, setPrompt_en] = useState(null); // 上を英訳
     const [imageUrls, setImageUrls] = useState([]); // 出力された画像のURL
     const [newWord, setNewWord] = useState(null); // プロンプトを後から追加
+    const MAX_IMAGES = 3
 
     // 現在のフェーズを判定する　1:初期状態 2:ローディング中 3: 生成完了
     const [nowPhase, setNowPhase] = useState(1);
@@ -101,10 +102,11 @@ const GetImage = () => {
                 // 結果をurlDataに入れる
                 const urlData = response.data.data[0].url;
                 // 画像が保存できる上限に達していたら、一番古い画像を削除する
-                if (imageUrls.length >= 3) {
+                if (imageUrls.length >= MAX_IMAGES) {
                     console.log("限界突破")
 
-                    setImageUrls([imageUrls[1],imageUrls[2],urlData])
+                    // setImageUrls([imageUrls[1],imageUrls[2],urlData])
+                    setImageUrls([...imageUrls.slice(1,MAX_IMAGES),urlData])
                 } else {
                     console.log("まだやれる")
                     // 画像を配列に保存する
