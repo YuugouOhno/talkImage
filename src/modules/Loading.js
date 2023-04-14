@@ -1,17 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 
 const NomalLoading = () => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400, // 1秒でフェードインする
+      useNativeDriver: true, // ネイティブアニメーションを使用
+    }).start();
+  }, [fadeAnim]);
+
+
   return (
     <View style={normalLoadingStyles.container}>
-      <View style={normalLoadingStyles.overlay}/>
-      <Text style={normalLoadingStyles.loading}>Loading</Text>
+      <Animated.View style={[normalLoadingStyles.overlay, { opacity: fadeAnim }]} />
+      <Animated.Text style={[normalLoadingStyles.loading, { opacity: fadeAnim }]}>
+        Loading
+      </Animated.Text>
     </View>
   );
 };
 
 const Loading = (props) => {
-
   // ファイル名を親コンポーネントから取得
   const fileName = props.file.name;
   // ファイル名からトーク相手の名前を取得
@@ -75,11 +87,22 @@ const Loading = (props) => {
     );
   };
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400, // 1秒でフェードインする
+      useNativeDriver: true, // ネイティブアニメーションを使用
+    }).start();
+  }, [fadeAnim]);
+
+
   return (
     <View style={loadingStyles.container}>
-      <View style={loadingStyles.messagesContainer}>
+      <Animated.View style={[loadingStyles.messagesContainer, { opacity: fadeAnim}]}>
         {messages.slice(0, currentMessages + 1).map(renderMessage)}
-      </View>
+      </Animated.View>
       <View style={loadingStyles.overlay}/>
       <Text style={loadingStyles.loading}>{loadingText}</Text>
     </View>
