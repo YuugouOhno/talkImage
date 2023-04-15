@@ -138,7 +138,7 @@ const GetImage = () => {
     // 画像を再生成する
     const reGenerate = () => {
         //ローディングを開始する
-        setNowPhase(2);
+        setNowPhase(3);
         const newPrompt = prompt_ja + "," + newWord;
         setPrompt_ja(newPrompt);
         // 入力をクリアする
