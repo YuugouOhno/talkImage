@@ -4,19 +4,10 @@ import GetImage from './GetImage';
 
 const Home = () => {
     return (
-        <View style={styles.container}>
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
           <GetImage />
           <StatusBar style="auto" />
         </View>
 )};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  }
-});
 
 export default Home;
