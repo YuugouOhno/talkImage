@@ -126,7 +126,6 @@ container: {
   backgroundColor: '#fff',
 },
 scrollContainer: {
-  flex: 1,
   alignItems: 'center',
   paddingTop: 50,
   paddingBottom: 50,

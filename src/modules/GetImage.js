@@ -266,8 +266,14 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
         alignItems: 'center',
-        justifyContent: 'center',
         width: '100%',
+        marginTop: 10,
+    },
+    buttonContainer: {
+      width: 130,
+    },
+    selectedFileContainer: {
+        marginTop: 25,
     },
     finRankingTitle: {
         fontSize: 30,

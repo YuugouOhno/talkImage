@@ -6,7 +6,7 @@ const Header = () => {
         <View style={styles.container}>
             <Image
                 source={IconImage}
-                style={{ width: 50, height: 50 }}
+                style={{ width: 40, height: 40 }}
             />
             <Text style={styles.text}>Talk Image</Text>
         </View>
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     },
     text:{
         color: "white",
-        fontSize: 35,
+        fontSize: 25,
         marginLeft: 5
     }
 });
