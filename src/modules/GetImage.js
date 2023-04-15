@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, Image, Button, View, Text, TextInput, StyleSheet } from 'react-native';
+import { ScrollView, Image, Button, View, Text, TextInput, StyleSheet, FlatList } from 'react-native';
 import 'react-native-url-polyfill/auto';
 import { OPEN_AI_API_KEY } from 'dotenv';
 import { TRANSLATE_KEY } from 'dotenv';
@@ -24,10 +24,13 @@ const GetImage = () => {
     const [prompt_en, setPrompt_en] = useState(null); // 上を英訳
     const [imageUrls, setImageUrls] = useState([]); // 出力された画像のURL
     const [newWord, setNewWord] = useState(""); // プロンプトを後から追加
-    const MAX_IMAGES = 3 // 画像の保存上限を指定
+    const MAX_IMAGES = 4 // 画像の保存上限を指定
 
     // 現在のフェーズを判定する　1:初期状態 2:ローディング中 3: 生成完了
     const [nowPhase, setNowPhase] = useState(1);
+
+    const [isAddNewPrompt, setIsAddNewPrompt] = useState(false); // プロンプトの追加を表示
+
 
     // 選択したファイルをセットする
     const selectFile = async () => {
@@ -150,6 +153,7 @@ const GetImage = () => {
         setPrompt_en(null);
         setImageUrls([]);
         setNewWord("");
+        setIsAddNewPrompt(false);
 
         //初期状態に戻る
         setNowPhase(1);
@@ -219,14 +223,29 @@ const GetImage = () => {
                                         </View>
                                         {/* ))} */}
                                     </View>
-                                    <View style={styles.finImageContainer}>
-                                        {imageUrls.map((url, index) => (
-                                            <Image key={index} style={{ width: 100, height: 100 }} source={{ uri: url }} />
-                                        ))}
+                                    <Text style={styles.finImageTitle}>トークから生成された画像</Text>
+
+                                    {
+                                        imageUrls.length > 1 && (
+                                            <View style={styles.finImagesContainer}>
+                                                <Image style={{ width: 100, height: 100, margin:4 }} source={{ uri: imageUrls[imageUrls.length - 2] }} resizeMode="contain" />
+                                                {imageUrls.length>=3 ?<Image style={{ width: 100, height: 100, margin:4 }} source={{ uri: imageUrls[imageUrls.length - 3] }} resizeMode="contain" />:""}
+                                                {imageUrls.length>=4 ?<Image style={{ width: 100, height: 100, margin:4 }} source={{ uri: imageUrls[imageUrls.length - 4] }} resizeMode="contain" />:""}
+                                            </View>
+                                        )}
+                                    <Image style={{ width: 320, height: 320, margin:8 }} source={{ uri: imageUrls[imageUrls.length - 1] }} />
+
+                                    <Text style={styles.finNowPromptTitle}>使用したプロンプト</Text>
+                                    <View style={styles.finPromptComponent}>
+                                        <Text style={styles.finNowPrompt}>{prompt_ja}</Text>
+                                        {isAddNewPrompt && (
+                                        <TextInput style={styles.finAddPrompt} placeholder='追加するプロンプト' value={newWord} onChangeText={(value) => setNewWord(value)} />
+                                        )}
                                     </View>
-                                    <Text style={styles.finNowPrompt}>プロンプト：{prompt_ja}</Text>
-                                    <TextInput style={styles.finAddPrompt} placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
-                                    <Button style={styles.finRegenerateButton} title="画像の再生成" onPress={reGenerate} />
+                                    <View style={styles.finRegenerateContainer}>
+                                        <Button style={styles.finRegenerateButton} title="画像の再生成" onPress={reGenerate} />
+                                        <Button style={styles.finAddPromptButton} title={isAddNewPrompt ?"やめる":"プロンプトを追加する"} onPress={()=>setIsAddNewPrompt(!isAddNewPrompt)} />
+                                    </View>
                                     <Button style={styles.finReturnButton} title="最初からやり直す" onPress={reStart} />
                                 </View>
                             )
@@ -248,13 +267,14 @@ const styles = StyleSheet.create({
     finRankingTitle: {
         fontSize: 30,
         marginBottom: 10,
-        marginTop:30,
+        marginTop: 30,
         textAlign: 'center',
     },
     finContainer: {
-        backgroundColor: 'red',
+        backgroundColor: 'white',
         alignItems: 'center',
         justifyContent: 'center',
+        marginBottom:30,
     },
     finRankingContainer: {
         backgroundColor: 'white',
@@ -270,8 +290,6 @@ const styles = StyleSheet.create({
         fontSize: 30,
         color: '#ffa500',
         textShadowColor: "#ffd700",
-        textShadowOffset: "6",
-        textShadowRadius: "6",
         width: "18%",
         justifyContent: 'center',
     },
@@ -279,8 +297,6 @@ const styles = StyleSheet.create({
         fontSize: 25,
         color: '#DBDBDB',
         textShadowColor: "#c0c0c0",
-        textShadowOffset: "6",
-        textShadowRadius: "6",
         width: "18%",
         justifyContent: 'center',
     },
@@ -288,8 +304,6 @@ const styles = StyleSheet.create({
         fontSize: 23,
         color: '#dcb890',
         textShadowColor: "#b87333",
-        textShadowOffset: "6",
-        textShadowRadius: "6",
         width: "18%",
         justifyContent: 'center',
     },
@@ -304,20 +318,52 @@ const styles = StyleSheet.create({
         width: "60%",
         textAlign: 'center',
     },
-    finImageContainer: {
-        backgroundColor: 'green'
+    finImagesContainer: {
+        backgroundColor: 'white',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    finNowPrompt: {
-        backgroundColor: 'blue'
+    finImageTitle: {
+        fontSize: 30,
+        marginBottom: 10,
+        marginTop: 30,
+        textAlign: 'center',
+    },
+    finNowPromptTitle: {
+        fontSize: 20,
+        marginTop: 10,
+        textAlign: 'center',
+    },
+    finPromptComponent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    finNowPrompt:{
+        fontSize: 15,
+        marginTop: 10,
+        textAlign: 'center',
     },
     finAddPrompt: {
-        backgroundColor: 'purple'
+        fontSize: 20,
+        marginTop: 10,
+        textAlign: 'center',
+    },
+    finRegenerateContainer:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     finRegenerateButton: {
-        backgroundColor: 'pink'
+        color: 'primary',
+    },
+    finAddPromptButton:{
+
     },
     finReturnButton: {
-        backgroundColor: 'yellow'
+        color: 'yellow',
+        marginBottom:50
     }
 });
 
