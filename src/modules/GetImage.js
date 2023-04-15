@@ -4,6 +4,7 @@ import 'react-native-url-polyfill/auto';
 import { OPEN_AI_API_KEY } from 'dotenv';
 import { TRANSLATE_KEY } from 'dotenv';
 import axios from 'axios';
+import Description from './Description';
 import { NomalLoading } from './Loading';
 import { Loading } from './Loading';
 
@@ -163,14 +164,18 @@ const GetImage = () => {
         case 1:
             return (
                 <View style={styles.container}>
-                    <Text>あなたのトーク履歴から、世界に一枚だけの画像を生成します</Text>
-                    <Button title="ファイルを選択してください" onPress={selectFile} />
-                    {
-                        file && (
-                            <Text>選択されたファイル：{file.name}</Text>
-                        )
-                    }
-                    <Button title="画像の生成" onPress={generate} disabled={!file} />
+                  <Description />
+                  <View style={[styles.buttonContainer, { marginTop: 25, marginBottom: 1 }]}>
+                    <Button title="ファイルを選択" onPress={selectFile} />
+                  </View>
+                  <View style={styles.buttonContainer}>
+                    <Button title="画像生成" onPress={generate} disabled={!file} />
+                  </View>
+                  <View style={styles.selectedFileContainer}>
+                    {file && (
+                        <Text>file: {file.name}</Text>
+                    )}
+                  </View>
                 </View>
             )
         case 2:
