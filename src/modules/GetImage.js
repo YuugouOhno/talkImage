@@ -69,6 +69,9 @@ const GetImage = () => {
             setNowPhase(3);
 
             const responseJson = JSON.parse(response.data.top_10);
+            // Androidの場合、なぜかこの console.log がないと動かない
+            console.log(responseJsonTalk);
+            console.log(responseJson);
             // ランキングをセット
             setRanking(responseJson);
             //　上位3位をセット
@@ -294,7 +297,6 @@ const styles = StyleSheet.create({
     finRanking: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'left',
         height: 30,
     },
     finRank1: {
