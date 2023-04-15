@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Image, Button, View, Text, TextInput, StyleSheet } from 'react-native';
+import { ScrollView, Image, Button, View, Text, TextInput, StyleSheet } from 'react-native';
 import 'react-native-url-polyfill/auto';
 import { OPEN_AI_API_KEY } from 'dotenv';
 import { TRANSLATE_KEY } from 'dotenv';
 import axios from 'axios';
-import {NomalLoading} from './Loading';
-import {Loading} from './Loading';
+import { NomalLoading } from './Loading';
+import { Loading } from './Loading';
 
 import * as DocumentPicker from 'expo-document-picker';
 
@@ -115,13 +115,13 @@ const GetImage = () => {
                 if (imageUrls.length >= MAX_IMAGES) {
                     console.log("限界突破")
                     // 配列の最初を除外して、画像を配列に保存する
-                    setImageUrls([...imageUrls.slice(1,MAX_IMAGES),urlData])
+                    setImageUrls([...imageUrls.slice(1, MAX_IMAGES), urlData])
                 } else {
                     console.log("まだやれる")
                     // 画像を配列に保存する
                     setImageUrls([...imageUrls, urlData]);
                 }
-                console.log("生成された画像",imageUrls);
+                console.log("生成された画像", imageUrls);
                 // 画像の生成完了
                 setNowPhase(4);
             } catch (error) {
@@ -171,35 +171,67 @@ const GetImage = () => {
             )
         case 2:
             return (
-                <NomalLoading/>
+                <NomalLoading />
             )
         case 3:
             return (
-                <Loading file={file} talk={talk}/>
+                <Loading file={file} talk={talk} />
             )
         case 4:
             return (
                 <View style={styles.container}>
-                    {
-                        ranking && imageUrls && (
-                            <View>
-                                {ranking.map((item, index) => (
-                                    <View key={index}>
-                                        <Text>{item.rank}位「{item.word}」（{item.num_of_use}回）</Text>
+                    <ScrollView>
+                        {
+                            ranking && imageUrls && (
+                                <View style={styles.finContainer}>
+                                    <Text style={styles.finRankingTitle}>👑使った言葉ランキング👑</Text>
+                                    <View style={styles.finRankingContainer}>
+                                        {/* {ranking.map((item, index) => ( */}
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank1}>1位</Text><Text style={styles.finRankWord}>{ranking[0].word}</Text><Text>（{ranking[0].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank2}>2位</Text><Text style={styles.finRankWord}>{ranking[1].word}</Text><Text>（{ranking[1].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank3}>3位</Text><Text style={styles.finRankWord}>{ranking[2].word}</Text><Text>（{ranking[2].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank4to10}> 4位</Text><Text style={styles.finRankWord}>{ranking[3].word}</Text><Text>（{ranking[3].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank4to10}> 5位</Text><Text style={styles.finRankWord}>{ranking[4].word}</Text><Text>（{ranking[4].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank4to10}> 6位</Text><Text style={styles.finRankWord}>{ranking[5].word}</Text><Text>（{ranking[5].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank4to10}> 7位</Text><Text style={styles.finRankWord}>{ranking[6].word}</Text><Text>（{ranking[6].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank4to10}> 8位</Text><Text style={styles.finRankWord}>{ranking[7].word}</Text><Text>（{ranking[7].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank4to10}> 9位</Text><Text style={styles.finRankWord}>{ranking[8].word}</Text><Text>（{ranking[8].num_of_use}回）</Text>
+                                        </View>
+                                        <View style={styles.finRanking}>
+                                            <Text style={styles.finRank4to10}>10位</Text><Text style={styles.finRankWord}>{ranking[9].word}</Text><Text>（{ranking[9].num_of_use}回）</Text>
+                                        </View>
+                                        {/* ))} */}
                                     </View>
-                                ))}
-                                {imageUrls.map((url, index) => (
-                                    <View key={index}>
-                                        <Image style={{ width: 100, height: 100 }} source={{ uri: url }} />
+                                    <View style={styles.finImageContainer}>
+                                        {imageUrls.map((url, index) => (
+                                            <Image key={index} style={{ width: 100, height: 100 }} source={{ uri: url }} />
+                                        ))}
                                     </View>
-                                ))}
-                                <Text>プロンプト：{prompt_ja}</Text>
-                                <TextInput placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
-                                <Button title="画像の再生成" onPress={reGenerate} />
-                                <Button title="最初からやり直す" onPress={reStart} />
-                            </View>
-                        )
-                    }
+                                    <Text style={styles.finNowPrompt}>プロンプト：{prompt_ja}</Text>
+                                    <TextInput style={styles.finAddPrompt} placeholder='プロンプトの追加' value={newWord} onChangeText={(value) => setNewWord(value)} />
+                                    <Button style={styles.finRegenerateButton} title="画像の再生成" onPress={reGenerate} />
+                                    <Button style={styles.finReturnButton} title="最初からやり直す" onPress={reStart} />
+                                </View>
+                            )
+                        }
+                    </ScrollView>
                 </View>
             )
     }
@@ -208,9 +240,84 @@ const GetImage = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         alignItems: 'center',
         justifyContent: 'center',
+        width: '100%',
+    },
+    finRankingTitle: {
+        fontSize: 30,
+        marginBottom: 10,
+        marginTop:30,
+        textAlign: 'center',
+    },
+    finContainer: {
+        backgroundColor: 'red',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    finRankingContainer: {
+        backgroundColor: 'white',
+        width: '80%',
+    },
+    finRanking: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'left',
+        height: 30,
+    },
+    finRank1: {
+        fontSize: 30,
+        color: '#ffa500',
+        textShadowColor: "#ffd700",
+        textShadowOffset: "6",
+        textShadowRadius: "6",
+        width: "18%",
+        justifyContent: 'center',
+    },
+    finRank2: {
+        fontSize: 25,
+        color: '#DBDBDB',
+        textShadowColor: "#c0c0c0",
+        textShadowOffset: "6",
+        textShadowRadius: "6",
+        width: "18%",
+        justifyContent: 'center',
+    },
+    finRank3: {
+        fontSize: 23,
+        color: '#dcb890',
+        textShadowColor: "#b87333",
+        textShadowOffset: "6",
+        textShadowRadius: "6",
+        width: "18%",
+        justifyContent: 'center',
+    },
+    finRank4to10: {
+        fontSize: 20,
+        color: 'black',
+        width: "18%",
+        justifyContent: 'center',
+    },
+    finRankWord: {
+        fontSize: 20,
+        width: "60%",
+        textAlign: 'center',
+    },
+    finImageContainer: {
+        backgroundColor: 'green'
+    },
+    finNowPrompt: {
+        backgroundColor: 'blue'
+    },
+    finAddPrompt: {
+        backgroundColor: 'purple'
+    },
+    finRegenerateButton: {
+        backgroundColor: 'pink'
+    },
+    finReturnButton: {
+        backgroundColor: 'yellow'
     }
 });
 
