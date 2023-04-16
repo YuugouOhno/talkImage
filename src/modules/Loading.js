@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
+import { Audio } from 'expo-av';
 
 const NomalLoading = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -24,6 +25,18 @@ const NomalLoading = () => {
 };
 
 const Loading = (props) => {
+
+// メッセージ表示の際にLINE送信音なる関数
+  const playSoundLine = async () => {
+    const soundObject = new Audio.Sound();
+    try {
+      await soundObject.loadAsync(require('../../assets/line_message_sound.mp3'));
+      await soundObject.playAsync();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // ファイル名を親コンポーネントから取得
   const fileName = props.file.name;
   // ファイル名からトーク相手の名前を取得
@@ -63,11 +76,14 @@ const Loading = (props) => {
         }
         return ' ' + prev + '.';
       });
-    }, 500);
-
+    }, 600);
     // クリーンアップ関数で再レンダリングの際にinterval()を停止
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    playSoundLine();
+  }, [currentMessages]);
 
   const renderMessage = (message, index) => {
     const containerStyle = {
