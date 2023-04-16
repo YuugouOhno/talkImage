@@ -22,6 +22,7 @@ const GetImage = () => {
     const [talk, setTalk] = useState(null); // トークでの連続１０件
     const [ranking, setRanking] = useState(null); // トークでのランキングトップ１０
     const [prompt_ja, setPrompt_ja] = useState(null); // ランキングトップ３をカンマ区切りで
+    const [prompToChatGPT, setPrompToChatGPT] = useState(null); //chatGPTに渡すプロンプト
     const [prompt_en, setPrompt_en] = useState(null); // 上を英訳
     const [imageUrls, setImageUrls] = useState([]); // 出力された画像のURL
     const [newWord, setNewWord] = useState(""); // プロンプトを後から追加
@@ -31,7 +32,6 @@ const GetImage = () => {
     const [nowPhase, setNowPhase] = useState(1);
 
     const [isAddNewPrompt, setIsAddNewPrompt] = useState(false); // プロンプトの追加を表示
-
 
     // 選択したファイルをセットする
     const selectFile = async () => {
@@ -74,12 +74,37 @@ const GetImage = () => {
             console.log(responseJson);
             // ランキングをセット
             setRanking(responseJson);
-            //　上位3位をセット
-            setPrompt_ja(responseJson[0]["word"] + "," + responseJson[1]["word"] + "," + responseJson[2]["word"])
+            //chatGPTに渡すプロンプトを作成
+            const message = ("以下に単語を提示しますので、そこから画像生成AIに渡すいい感じのプロンプトを考えて下さい。プロンプトは30 字程度とし、体言止めで出力して下さい。"
+                                + responseJson[0]["word"] + "," + responseJson[1]["word"] + "," + responseJson[2]["word"])
+            setPrompToChatGPT(message)
         } catch (error) {
             console.error(error);
         }
     };
+
+    // chatGPT
+    useEffect(() => {
+        console.log("動けGPT",prompToChatGPT);
+        async function generateImage() {
+            try {
+                const completion = await openai.createChatCompletion({
+                    model: "gpt-3.5-turbo", // string;
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompToChatGPT,
+                        },
+                    ],
+                });
+                console.log("GPTの返答", completion.data.choices[0].message.content)
+                setPrompt_ja(completion.data.choices[0].message.content)
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        generateImage();
+    }, [prompToChatGPT]);
 
     //pronptの英訳
     //prompt_jaを監視して、変更があった場合に実行される
@@ -167,18 +192,18 @@ const GetImage = () => {
         case 1:
             return (
                 <View style={styles.container}>
-                  <Description />
-                  <View style={[styles.buttonContainer, { marginTop: 25, marginBottom: 1 }]}>
-                    <Button title="ファイルを選択" onPress={selectFile} />
-                  </View>
-                  <View style={styles.buttonContainer}>
-                    <Button title="画像生成" onPress={generate} disabled={!file} />
-                  </View>
-                  <View style={styles.selectedFileContainer}>
-                    {file && (
-                        <Text>file: {file.name}</Text>
-                    )}
-                  </View>
+                    <Description />
+                    <View style={[styles.buttonContainer, { marginTop: 25, marginBottom: 1 }]}>
+                        <Button title="ファイルを選択" onPress={selectFile} />
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <Button title="画像生成" onPress={generate} disabled={!file} />
+                    </View>
+                    <View style={styles.selectedFileContainer}>
+                        {file && (
+                            <Text>file: {file.name}</Text>
+                        )}
+                    </View>
                 </View>
             )
         case 2:
@@ -236,23 +261,23 @@ const GetImage = () => {
                                     {
                                         imageUrls.length > 1 && (
                                             <View style={styles.finImagesContainer}>
-                                                <Image style={{ width: 100, height: 100, margin:4 }} source={{ uri: imageUrls[imageUrls.length - 2] }} resizeMode="contain" />
-                                                {imageUrls.length>=3 ?<Image style={{ width: 100, height: 100, margin:4 }} source={{ uri: imageUrls[imageUrls.length - 3] }} resizeMode="contain" />:""}
-                                                {imageUrls.length>=4 ?<Image style={{ width: 100, height: 100, margin:4 }} source={{ uri: imageUrls[imageUrls.length - 4] }} resizeMode="contain" />:""}
+                                                <Image style={{ width: 100, height: 100, margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 2] }} resizeMode="contain" />
+                                                {imageUrls.length >= 3 ? <Image style={{ width: 100, height: 100, margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 3] }} resizeMode="contain" /> : ""}
+                                                {imageUrls.length >= 4 ? <Image style={{ width: 100, height: 100, margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 4] }} resizeMode="contain" /> : ""}
                                             </View>
                                         )}
-                                    <Image style={{ width: 320, height: 320, margin:8 }} source={{ uri: imageUrls[imageUrls.length - 1] }} />
+                                    <Image style={{ width: 320, height: 320, margin: 8 }} source={{ uri: imageUrls[imageUrls.length - 1] }} />
 
                                     <Text style={styles.finNowPromptTitle}>使用したプロンプト</Text>
                                     <View style={styles.finPromptComponent}>
                                         <Text style={styles.finNowPrompt}>{prompt_ja}</Text>
                                         {isAddNewPrompt && (
-                                        <TextInput style={styles.finAddPrompt} placeholder='追加するプロンプト' value={newWord} onChangeText={(value) => setNewWord(value)} />
+                                            <TextInput style={styles.finAddPrompt} placeholder='追加するプロンプト' value={newWord} onChangeText={(value) => setNewWord(value)} />
                                         )}
                                     </View>
                                     <View style={styles.finRegenerateContainer}>
                                         <Button style={styles.finRegenerateButton} title="画像の再生成" onPress={reGenerate} />
-                                        <Button style={styles.finAddPromptButton} title={isAddNewPrompt ?"やめる":"プロンプトを追加する"} onPress={()=>setIsAddNewPrompt(!isAddNewPrompt)} />
+                                        <Button style={styles.finAddPromptButton} title={isAddNewPrompt ? "やめる" : "プロンプトを追加する"} onPress={() => setIsAddNewPrompt(!isAddNewPrompt)} />
                                     </View>
                                     <Button style={styles.finReturnButton} title="最初からやり直す" onPress={reStart} />
                                 </View>
@@ -273,7 +298,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     buttonContainer: {
-      width: 130,
+        width: 130,
     },
     selectedFileContainer: {
         marginTop: 25,
@@ -288,7 +313,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom:30,
+        marginBottom: 30,
     },
     finRankingContainer: {
         backgroundColor: 'white',
@@ -353,7 +378,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    finNowPrompt:{
+    finNowPrompt: {
         fontSize: 15,
         marginTop: 10,
         textAlign: 'center',
@@ -363,7 +388,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         textAlign: 'center',
     },
-    finRegenerateContainer:{
+    finRegenerateContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -371,12 +396,12 @@ const styles = StyleSheet.create({
     finRegenerateButton: {
         color: 'primary',
     },
-    finAddPromptButton:{
+    finAddPromptButton: {
 
     },
     finReturnButton: {
         color: 'yellow',
-        marginBottom:50
+        marginBottom: 50
     }
 });
 
