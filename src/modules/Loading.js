@@ -82,7 +82,9 @@ const Loading = (props) => {
   }, []);
 
   useEffect(() => {
-    playSoundLine();
+    if(currentMessages<10){
+      playSoundLine();
+    }
   }, [currentMessages]);
 
   const renderMessage = (message, index) => {
