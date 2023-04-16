@@ -75,7 +75,7 @@ const Description = () => {
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.subtitle}>3. フリーワードを入力する</Text>
-                  <Image source={require('../../assets/description_2.png')} style={styles.screenshot} />
+                  <Image source={require('../../assets/description_3.png')} style={styles.screenshot} />
                   <Text>
                     フリーワードを入力することで、{'\n'}
                     追加で画像を生成できます。{'\n'}
@@ -146,6 +146,8 @@ subtitle: {
 screenshot: {
   width: 240,
   height: 510,
+  borderWidth: 1,
+  borderColor: 'black',
   marginTop: 20,
   marginBottom: 20,
 },
