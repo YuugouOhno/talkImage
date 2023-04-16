@@ -75,7 +75,7 @@ const GetImage = () => {
             // ランキングをセット
             setRanking(responseJson);
             //chatGPTに渡すプロンプトを作成
-            const message = ("以下に単語を提示しますので、そこから画像生成AIに渡すいい感じのプロンプトを考えて下さい。プロンプトは30 字程度とし、体言止めで出力して下さい。"
+            const message = ("以下に単語を提示しますので、そこから画像生成AIに渡すいい感じのプロンプトを考えて下さい。プロンプトは30字以内とし、体言止めで出力して下さい。必ず全ての単語を一文にまとめて下さい。"
                                 + responseJson[0]["word"] + "," + responseJson[1]["word"] + "," + responseJson[2]["word"])
             setPrompToChatGPT(message)
         } catch (error) {
@@ -167,8 +167,9 @@ const GetImage = () => {
     const reGenerate = () => {
         //ローディングを開始する
         setNowPhase(3);
-        const newPrompt = prompt_ja + "," + newWord;
-        setPrompt_ja(newPrompt);
+        const message = ("以下に単語を提示しますので、そこから画像生成AIに渡すいい感じのプロンプトを考えて下さい。プロンプトは30字以内とし、体言止めで出力して下さい。必ず全ての単語を一文にまとめて下さい。"
+                                + ranking[0].word + "," + ranking[1].word + "," + ranking[2].word + "," + newWord)
+            setPrompToChatGPT(message)
         // 入力をクリアする
         setNewWord("");
     }
@@ -217,69 +218,79 @@ const GetImage = () => {
         case 4:
             return (
                 <View style={styles.container}>
-                    <ScrollView>
+                    <ScrollView showsVerticalScrollIndicator={false}>
                         {
                             ranking && imageUrls && (
-                                <View style={styles.finContainer}>
-                                    <Text style={styles.finRankingTitle}>👑使った言葉ランキング👑</Text>
-                                    <View style={styles.finRankingContainer}>
-                                        {/* {ranking.map((item, index) => ( */}
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank1}>1位</Text><Text style={styles.finRankWord}>{ranking[0].word}</Text><Text>（{ranking[0].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank2}>2位</Text><Text style={styles.finRankWord}>{ranking[1].word}</Text><Text>（{ranking[1].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank3}>3位</Text><Text style={styles.finRankWord}>{ranking[2].word}</Text><Text>（{ranking[2].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank4to10}> 4位</Text><Text style={styles.finRankWord}>{ranking[3].word}</Text><Text>（{ranking[3].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank4to10}> 5位</Text><Text style={styles.finRankWord}>{ranking[4].word}</Text><Text>（{ranking[4].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank4to10}> 6位</Text><Text style={styles.finRankWord}>{ranking[5].word}</Text><Text>（{ranking[5].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank4to10}> 7位</Text><Text style={styles.finRankWord}>{ranking[6].word}</Text><Text>（{ranking[6].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank4to10}> 8位</Text><Text style={styles.finRankWord}>{ranking[7].word}</Text><Text>（{ranking[7].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank4to10}> 9位</Text><Text style={styles.finRankWord}>{ranking[8].word}</Text><Text>（{ranking[8].num_of_use}回）</Text>
-                                        </View>
-                                        <View style={styles.finRanking}>
-                                            <Text style={styles.finRank4to10}>10位</Text><Text style={styles.finRankWord}>{ranking[9].word}</Text><Text>（{ranking[9].num_of_use}回）</Text>
-                                        </View>
-                                        {/* ))} */}
-                                    </View>
-                                    <Text style={styles.finImageTitle}>トークから生成された画像</Text>
+                              <View style={styles.finContainer}>
+                                  <Text style={styles.finRankingTitle}>👑&nbsp;単語の使用回数&nbsp;👑</Text>
+                                  <View style={styles.finRankingContainer}>
+                                      {/* {ranking.map((item, index) => ( */}
+                                      <View style={styles.finRanking}>
+                                          <Text style={[styles.finRank4to10, { color: '#ffa500', textShadowColor: "#ffd700" }]}>&nbsp;1位</Text><Text style={styles.finRankWord}>{ranking[0].word}</Text><Text>（{ranking[0].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={[styles.finRank4to10, { color: '#DBDBDB', textShadowColor: "#c0c0c0" }]}>&nbsp;2位</Text><Text style={styles.finRankWord}>{ranking[1].word}</Text><Text>（{ranking[1].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={[styles.finRank4to10, { color: '#dcb890', textShadowColor: "#b87333" }]}>&nbsp;3位</Text><Text style={styles.finRankWord}>{ranking[2].word}</Text><Text>（{ranking[2].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={styles.finRank4to10}>&nbsp;4位</Text><Text style={styles.finRankWord}>{ranking[3].word}</Text><Text>（{ranking[3].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={styles.finRank4to10}>&nbsp;5位</Text><Text style={styles.finRankWord}>{ranking[4].word}</Text><Text>（{ranking[4].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={styles.finRank4to10}>&nbsp;6位</Text><Text style={styles.finRankWord}>{ranking[5].word}</Text><Text>（{ranking[5].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={styles.finRank4to10}>&nbsp;7位</Text><Text style={styles.finRankWord}>{ranking[6].word}</Text><Text>（{ranking[6].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={styles.finRank4to10}>&nbsp;8位</Text><Text style={styles.finRankWord}>{ranking[7].word}</Text><Text>（{ranking[7].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={styles.finRank4to10}>&nbsp;9位</Text><Text style={styles.finRankWord}>{ranking[8].word}</Text><Text>（{ranking[8].num_of_use}回）</Text>
+                                      </View>
+                                      <View style={styles.finRanking}>
+                                          <Text style={styles.finRank4to10}>10位</Text><Text style={styles.finRankWord}>{ranking[9].word}</Text><Text>（{ranking[9].num_of_use}回）</Text>
+                                      </View>
+                                      {/* ))} */}
+                                  </View>
+                                  <Text style={styles.finImageTitle}>トークから生成された画像</Text>
 
-                                    {
-                                        imageUrls.length > 1 && (
-                                            <View style={styles.finImagesContainer}>
-                                                <Image style={{ width: 100, height: 100, margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 2] }} resizeMode="contain" />
-                                                {imageUrls.length >= 3 ? <Image style={{ width: 100, height: 100, margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 3] }} resizeMode="contain" /> : ""}
-                                                {imageUrls.length >= 4 ? <Image style={{ width: 100, height: 100, margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 4] }} resizeMode="contain" /> : ""}
-                                            </View>
-                                        )}
-                                    <Image style={{ width: 320, height: 320, margin: 8 }} source={{ uri: imageUrls[imageUrls.length - 1] }} />
+                                  <View style={styles.finImagesContainer2}>
+                                      {
+                                          imageUrls.length > 1 && (
+                                              <View style={styles.finImagesContainer}>
+                                                  <Image style={{ width: '31%', height: 0, paddingBottom: '31%', margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 2] }} resizeMode="contain" />
+                                                  {imageUrls.length >= 3 ? <Image style={{ width: '31%', height: 0, paddingBottom: '31%', margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 3] }} resizeMode="contain" /> : ""}
+                                                  {imageUrls.length >= 4 ? <Image style={{ width: '31%', height: 0, paddingBottom: '31%', margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 4] }} resizeMode="contain" /> : ""}
+                                              </View>
+                                          )}
+                                      <View style={styles.centerContainer}>
+                                          <Image style={{ width: '100%', height: 0, paddingBottom: '100%', margin: 8 }} source={{ uri: imageUrls[imageUrls.length - 1] }} />
+                                      </View>
+                                  </View>
 
-                                    <Text style={styles.finNowPromptTitle}>使用したプロンプト</Text>
+                                    <Text style={styles.finNowPromptTitle}>画像生成に使用した文章</Text>
                                     <View style={styles.finPromptComponent}>
                                         <Text style={styles.finNowPrompt}>{prompt_ja}</Text>
                                         {isAddNewPrompt && (
-                                            <TextInput style={styles.finAddPrompt} placeholder='追加するプロンプト' value={newWord} onChangeText={(value) => setNewWord(value)} />
+                                            <TextInput style={styles.finAddPrompt} placeholder='単語を入力' value={newWord} onChangeText={(value) => setNewWord(value)} />
                                         )}
                                     </View>
                                     <View style={styles.finRegenerateContainer}>
-                                        <Button style={styles.finRegenerateButton} title="画像の再生成" onPress={reGenerate} />
-                                        <Button style={styles.finAddPromptButton} title={isAddNewPrompt ? "やめる" : "プロンプトを追加する"} onPress={() => setIsAddNewPrompt(!isAddNewPrompt)} />
+                                        <View style={styles.buttonContainer2}>
+                                            <Button style={styles.finRegenerateButton} title="画像の再生成" onPress={reGenerate} />
+                                        </View>
+                                        <View style={styles.buttonContainer2}>
+                                            <Button style={styles.finAddPromptButton} title={isAddNewPrompt ?"やめる":"単語の追加"} onPress={()=>setIsAddNewPrompt(!isAddNewPrompt)} />
+                                        </View>
                                     </View>
-                                    <Button style={styles.finReturnButton} title="最初からやり直す" onPress={reStart} />
+                                    <View style={styles.buttonContainer3}>
+                                        <Button style={styles.finReturnButton} title="最初からやり直す" onPress={reStart} />
+                                    </View>
                                 </View>
                             )
                         }
@@ -290,119 +301,139 @@ const GetImage = () => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white',
-        alignItems: 'center',
-        width: '100%',
-        marginTop: 10,
-    },
-    buttonContainer: {
-        width: 130,
-    },
-    selectedFileContainer: {
-        marginTop: 25,
-    },
-    finRankingTitle: {
-        fontSize: 30,
-        marginBottom: 10,
-        marginTop: 30,
-        textAlign: 'center',
-    },
-    finContainer: {
-        backgroundColor: 'white',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 30,
-    },
-    finRankingContainer: {
-        backgroundColor: 'white',
-        width: '80%',
-    },
-    finRanking: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 30,
-    },
-    finRank1: {
-        fontSize: 30,
-        color: '#ffa500',
-        textShadowColor: "#ffd700",
-        width: "18%",
-        justifyContent: 'center',
-    },
-    finRank2: {
-        fontSize: 25,
-        color: '#DBDBDB',
-        textShadowColor: "#c0c0c0",
-        width: "18%",
-        justifyContent: 'center',
-    },
-    finRank3: {
-        fontSize: 23,
-        color: '#dcb890',
-        textShadowColor: "#b87333",
-        width: "18%",
-        justifyContent: 'center',
-    },
-    finRank4to10: {
-        fontSize: 20,
-        color: 'black',
-        width: "18%",
-        justifyContent: 'center',
-    },
-    finRankWord: {
-        fontSize: 20,
-        width: "60%",
-        textAlign: 'center',
-    },
-    finImagesContainer: {
-        backgroundColor: 'white',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    finImageTitle: {
-        fontSize: 30,
-        marginBottom: 10,
-        marginTop: 30,
-        textAlign: 'center',
-    },
-    finNowPromptTitle: {
-        fontSize: 20,
-        marginTop: 10,
-        textAlign: 'center',
-    },
-    finPromptComponent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    finNowPrompt: {
-        fontSize: 15,
-        marginTop: 10,
-        textAlign: 'center',
-    },
-    finAddPrompt: {
-        fontSize: 20,
-        marginTop: 10,
-        textAlign: 'center',
-    },
-    finRegenerateContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    finRegenerateButton: {
-        color: 'primary',
-    },
-    finAddPromptButton: {
-
-    },
-    finReturnButton: {
-        color: 'yellow',
-        marginBottom: 50
-    }
+  container: {
+      flex: 1,
+      backgroundColor: 'white',
+      alignItems: 'center',
+      width: '100%',
+      marginTop: 10,
+  },
+  centerContainer: {
+    alignItems: 'center',
+  },
+  buttonContainer: {
+    width: 130,
+  },
+  buttonContainer2: {
+    width: 110,
+  },
+  buttonContainer3: {
+    width: 220,
+  },
+  selectedFileContainer: {
+      marginTop: 25,
+  },
+  finRankingTitle: {
+      fontSize: 24,
+      marginBottom: 10,
+      marginTop: 10,
+      textAlign: 'center',
+  },
+  finContainer: {
+      backgroundColor: 'white',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom:30,
+  },
+  finRankingContainer: {
+      backgroundColor: '#DDFFDD',
+      borderRadius: 10,
+      padding: 18,
+      width: '90%',
+  },
+  finRanking: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: 30,
+  },
+  finRank1: {
+      fontSize: 30,
+      color: '#ffa500',
+      textShadowColor: "#ffd700",
+      width: "18%",
+      justifyContent: 'center',
+  },
+  finRank2: {
+      fontSize: 25,
+      color: '#DBDBDB',
+      textShadowColor: "#c0c0c0",
+      width: "18%",
+      justifyContent: 'center',
+  },
+  finRank3: {
+      fontSize: 23,
+      color: '#dcb890',
+      textShadowColor: "#b87333",
+      width: "18%",
+      justifyContent: 'center',
+  },
+  finRank4to10: {
+      fontSize: 20,
+      color: 'black',
+      width: "18%",
+      justifyContent: 'center',
+  },
+  finRankWord: {
+      fontSize: 18,
+      width: "60%",
+      textAlign: 'center',
+  },
+  finImagesContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+  },
+  finImagesContainer2: {
+    backgroundColor: '#e8e8e8',
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    width: '90%',
+  },
+  finImageTitle: {
+      fontSize: 24,
+      marginBottom: 10,
+      marginTop: 30,
+      textAlign: 'center',
+  },
+  finNowPromptTitle: {
+      fontSize: 20,
+      marginTop: 15,
+      textAlign: 'center',
+  },
+  finPromptComponent: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '90%',
+  },
+  finNowPrompt:{
+      fontSize: 15,
+      marginTop: 10,
+      textAlign: 'center',
+  },
+  finAddPrompt: {
+      fontSize: 15,
+      marginTop: 10,
+      textAlign: 'center',
+  },
+  finRegenerateContainer:{
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 10,
+      marginBottom: 1,
+  },
+  finRegenerateButton: {
+      color: 'primary',
+  },
+  finAddPromptButton:{
+  },
+  finReturnButton: {
+      color: 'yellow',
+      marginBottom:50
+  }
 });
 
 export default GetImage;
