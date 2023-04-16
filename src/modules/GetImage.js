@@ -184,6 +184,7 @@ const GetImage = () => {
         setImageUrls([]);
         setNewWord("");
         setIsAddNewPrompt(false);
+        setPrompToChatGPT(null); //chatGPTに渡すプロンプト
 
         //初期状態に戻る
         setNowPhase(1);
@@ -312,13 +313,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonContainer: {
-    width: 130,
+    width: 135,
   },
   buttonContainer2: {
-    width: 110,
+    width: 120,
   },
   buttonContainer3: {
-    width: 220,
+    width: 240,
   },
   selectedFileContainer: {
       marginTop: 25,
