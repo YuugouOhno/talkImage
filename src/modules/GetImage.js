@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, Image, Button, View, Text, TextInput, StyleSheet, FlatList } from 'react-native';
 import 'react-native-url-polyfill/auto';
-import { OPEN_AI_API_KEY } from 'dotenv';
-import { TRANSLATE_KEY } from 'dotenv';
+import { OPEN_AI_API_KEY } from '@env';
+import { TRANSLATE_KEY } from '@env';
 import axios from 'axios';
 import Description from './Description';
 import { NomalLoading } from './Loading';
@@ -85,32 +85,35 @@ const GetImage = () => {
 
     // chatGPT
     useEffect(() => {
-        console.log("動けGPT",prompToChatGPT);
-        async function generateImage() {
-            try {
-                const completion = await openai.createChatCompletion({
-                    model: "gpt-3.5-turbo", // string;
-                    messages: [
-                        {
-                            role: "user",
-                            content: prompToChatGPT,
-                        },
-                    ],
-                });
-                console.log("GPTの返答", completion.data.choices[0].message.content)
-                setPrompt_ja(completion.data.choices[0].message.content)
-            } catch (error) {
-                console.error(error);
+        if (prompToChatGPT) {
+            console.log("動けGPT",prompToChatGPT);
+            async function generateImage() {
+                try {
+                    const completion = await openai.createChatCompletion({
+                        model: "gpt-3.5-turbo", // string;
+                        messages: [
+                            {
+                                role: "user",
+                                content: prompToChatGPT,
+                            },
+                        ],
+                    });
+                    console.log("GPTの返答", completion.data.choices[0].message.content)
+                    setPrompt_ja(completion.data.choices[0].message.content)
+                } catch (error) {
+                    console.error(error);
+                }
             }
+            generateImage();
         }
-        generateImage();
+        
     }, [prompToChatGPT]);
 
     //pronptの英訳
     //prompt_jaを監視して、変更があった場合に実行される
     useEffect(() => {
-        console.log(prompt_ja, "を英訳");
         if (prompt_ja) {
+            console.log(prompt_ja, "を英訳");
             // 渡されたプロンプトを英語に変換
             async function translatePrompt() {
                 //　urlの{ranking}に渡った文字を英訳する
@@ -131,36 +134,39 @@ const GetImage = () => {
     //画像の生成
     //prompt_enを監視して、変更があった場合に実行される
     useEffect(() => {
-        console.log(prompt_en, "から画像を生成");
-        async function generateImage() {
-            // 画像生成の条件
-            const imageParameters = {
-                prompt: prompt_en,
-                n: 1,
-                size: "256x256",
-            }
-            try {
-                const response = await openai.createImage(imageParameters);
-                // 結果をurlDataに入れる
-                const urlData = response.data.data[0].url;
-                // 画像が保存できる上限に達していたら、一番古い画像を削除する
-                if (imageUrls.length >= MAX_IMAGES) {
-                    console.log("限界突破")
-                    // 配列の最初を除外して、画像を配列に保存する
-                    setImageUrls([...imageUrls.slice(1, MAX_IMAGES), urlData])
-                } else {
-                    console.log("まだやれる")
-                    // 画像を配列に保存する
-                    setImageUrls([...imageUrls, urlData]);
+        if (prompt_en) {
+            console.log(prompt_en, "から画像を生成");
+            async function generateImage() {
+                // 画像生成の条件
+                const imageParameters = {
+                    prompt: prompt_en,
+                    n: 1,
+                    size: "256x256",
                 }
-                console.log("生成された画像", imageUrls);
-                // 画像の生成完了
-                setNowPhase(4);
-            } catch (error) {
-                console.error(error);
+                try {
+                    const response = await openai.createImage(imageParameters);
+                    // 結果をurlDataに入れる
+                    const urlData = response.data.data[0].url;
+                    // 画像が保存できる上限に達していたら、一番古い画像を削除する
+                    if (imageUrls.length >= MAX_IMAGES) {
+                        console.log("限界突破")
+                        // 配列の最初を除外して、画像を配列に保存する
+                        setImageUrls([...imageUrls.slice(1, MAX_IMAGES), urlData])
+                    } else {
+                        console.log("まだやれる")
+                        // 画像を配列に保存する
+                        setImageUrls([...imageUrls, urlData]);
+                    }
+                    console.log("生成された画像", imageUrls);
+                    // 画像の生成完了
+                    setNowPhase(4);
+                } catch (error) {
+                    console.error(error);
+                }
             }
+            generateImage();
         }
-        generateImage();
+        
     }, [prompt_en]);
 
     // 画像を再生成する
