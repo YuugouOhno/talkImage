@@ -6,9 +6,9 @@ import WordCloud from './WordCloud';
 const Home = () => {
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
-          {/* <GetImage />
-          <StatusBar style="auto" /> */}
-          <WordCloud/>
+          <GetImage />
+          <StatusBar style="auto" />
+          {/* <WordCloud/> */}
         </View>
 )};
 
