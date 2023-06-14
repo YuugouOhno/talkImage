@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, Image, Button, View, Text, TextInput, StyleSheet, FlatList } from 'react-native';
+import { ScrollView, Image, Button, View, Text, TextInput, StyleSheet, FlatList, Modal, TouchableOpacity } from 'react-native';
 import 'react-native-url-polyfill/auto';
 import { OPEN_AI_API_KEY } from '@env';
 import { TRANSLATE_KEY } from '@env';
@@ -27,6 +27,8 @@ const GetImage = () => {
     const [imageUrls, setImageUrls] = useState([]); // 出力された画像のURL
     const [newWord, setNewWord] = useState(""); // プロンプトを後から追加
     const MAX_IMAGES = 4 // 画像の保存上限を指定
+    const [selectTouch, setSelectTouch] = useState(false); // 画像のタッチを指定する画面の表示・非表示
+    const [touchPrompt, setTouchPrompt] = useState(''); // 画像のタッチを指定する際のプロンプト
 
     // 現在のフェーズを判定する　1:初期状態 2:ローディング中 3: 生成完了
     const [nowPhase, setNowPhase] = useState(1);
@@ -106,7 +108,6 @@ const GetImage = () => {
             }
             generateImage();
         }
-        
     }, [prompToChatGPT]);
 
     //pronptの英訳
@@ -121,7 +122,7 @@ const GetImage = () => {
                 axios.post(url)
                     .then(response => {
                         // 結果をpromptに入れる
-                        setPrompt_en(response.data.translations[0].text);
+                        setPrompt_en(response.data.translations[0].text.replace('"', '') + touchPrompt);
                     })
                     .catch(error => {
                         console.log(error);
@@ -166,8 +167,34 @@ const GetImage = () => {
             }
             generateImage();
         }
-        
     }, [prompt_en]);
+
+    // 画像のタッチを指定する
+    const onPressReGenerate = () => {
+      setSelectTouch(true);
+    };
+
+    const selectAnimeStyle = () => {
+      setTouchPrompt(' anime style')
+      reGenerate();
+      setSelectTouch(false);
+    };
+
+    const selectRealisticStyle = () => {
+      setTouchPrompt(' true-to-life actual real style')
+      reGenerate();
+      setSelectTouch(false);
+    };
+
+    const selectNone = () => {
+      setTouchPrompt('')
+      reGenerate();
+      setSelectTouch(false);
+    }
+
+    const cancelReGenerate = () => {
+      setSelectTouch(false);
+    };
 
     // 画像を再生成する
     const reGenerate = () => {
@@ -289,7 +316,7 @@ const GetImage = () => {
                                     </View>
                                     <View style={styles.finRegenerateContainer}>
                                         <View style={styles.buttonContainer2}>
-                                            <Button style={styles.finRegenerateButton} title="画像の再生成" onPress={reGenerate} />
+                                            <Button style={styles.finRegenerateButton} title="画像の再生成" onPress={onPressReGenerate} />
                                         </View>
                                         <View style={styles.buttonContainer2}>
                                             <Button style={styles.finAddPromptButton} title={isAddNewPrompt ?"やめる":"単語の追加"} onPress={()=>setIsAddNewPrompt(!isAddNewPrompt)} />
@@ -302,6 +329,45 @@ const GetImage = () => {
                             )
                         }
                     </ScrollView>
+
+                  {/* 画像のタッチを指定 */}
+                  <Modal visible={selectTouch} animationType="fade">
+                    <View style={styles.modalContainer}>
+                      <View style={styles.selectContainer}>
+                        <Text style={styles.selectText}>画像のタッチを指定してください。</Text>
+                        <View style={styles.selectButtonContainer}>
+                          {/* アニメ */}
+                          <TouchableOpacity
+                            onPress={selectAnimeStyle}
+                            style={styles.animeButton}
+                          >
+                            <Text style={styles.animeButtonText}>アニメ</Text>
+                          </TouchableOpacity>
+                          {/* リアル */}
+                          <TouchableOpacity
+                            onPress={selectRealisticStyle}
+                            style={styles.realisticButton}
+                          >
+                            <Text style={styles.realisticButtonText}>リアル</Text>
+                          </TouchableOpacity>
+                          {/* 指定しない */}
+                          <TouchableOpacity
+                            onPress={selectNone}
+                            style={styles.noneButton}
+                          >
+                            <Text style={styles.noneButtonText}>指定しない</Text>
+                          </TouchableOpacity>
+                          {/* 戻る */}
+                          <TouchableOpacity
+                            onPress={cancelReGenerate}
+                            style={styles.cancelButton}
+                          >
+                            <Text style={styles.cancelButtonText}>戻る</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  </Modal>
                 </View>
             )
     }
@@ -440,7 +506,70 @@ const styles = StyleSheet.create({
   finReturnButton: {
       color: 'yellow',
       marginBottom:50
-  }
+  },
+
+  // 画像のタッチを指定
+  modalContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  selectContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  selectText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  selectButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  animeButton: {
+    padding: 10,
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginRight: 7.5,
+  },
+  animeButtonText: {
+    fontSize: 16,
+  },
+  realisticButton: {
+    padding: 10,
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginHorizontal: 7.5,
+  },
+  realisticButtonText: {
+    fontSize: 16,
+  },
+  noneButton: {
+    padding: 10,
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginHorizontal: 7.5,
+  },
+  noneButtonText: {
+    fontSize: 16,
+  },
+  cancelButton: {
+    backgroundColor: '#e60012',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 7.5,
+  },
+  cancelButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
 
 export default GetImage;
