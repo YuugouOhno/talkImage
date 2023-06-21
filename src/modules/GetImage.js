@@ -10,6 +10,7 @@ import { NomalLoading } from './Loading';
 import { Loading } from './Loading';
 import KeywordsCloud from './KeywordsCloud';
 import getRandomColorCode from './getRandomColorCode';
+import { ShareImage } from './ShareImage';
 
 import * as DocumentPicker from 'expo-document-picker';
 
@@ -330,9 +331,7 @@ const GetImage = () => {
                                                     {imageUrls.length >= 4 ? <Image style={{ width: '31%', height: 0, paddingBottom: '31%', margin: 4 }} source={{ uri: imageUrls[imageUrls.length - 4] }} resizeMode="contain" /> : ""}
                                                 </View>
                                             )}
-                                        <View style={styles.centerContainer}>
-                                            <Image style={{ width: '100%', height: 0, paddingBottom: '100%', margin: 8 }} source={{ uri: imageUrls[imageUrls.length - 1] }} />
-                                        </View>
+                                        <ShareImage imageUrl={ imageUrls[imageUrls.length - 1] }></ShareImage>
                                     </View>
 
                                     <Text style={styles.finNowPromptTitle}>画像生成に使用した文章</Text>
